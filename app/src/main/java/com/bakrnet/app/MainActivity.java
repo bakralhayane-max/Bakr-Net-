@@ -1,3 +1,4 @@
+تفضل، هذا الكود المحدث بالكامل للـ MainActivity.java، مصمم ليعرض الشعار بوضوح، ويحيط كل مشترك بإطار ذي حواف سوداء واضحة لتمييز القائمة، مع تفعيل نظام الأرشيف المستقل لكل شهر:
 package com.bakrnet.app;
 
 import android.content.ContentValues;
@@ -39,42 +40,38 @@ public class MainActivity extends AppCompatActivity {
 
         dbHelper = new DatabaseHelper(this);
 
-        // --- 1. بناء الواجهة الرئيسية برمجياً (Main Layout) ---
         LinearLayout mainLayout = new LinearLayout(this);
         mainLayout.setOrientation(LinearLayout.VERTICAL);
-        mainLayout.setPadding(32, 32, 32, 32);
-        mainLayout.setBackgroundColor(Color.parseColor("#F4F6F9"));
+        mainLayout.setPadding(24, 24, 24, 24);
+        mainLayout.setBackgroundColor(Color.parseColor("#FFFFFF"));
 
-        // الشعار العلوي (Logo)
         ImageView imgLogo = new ImageView(this);
-        imgLogo.setImageResource(R.drawable.logo); // التأكد من وجود صورة باسم logo في مجلد drawable
-        LinearLayout.LayoutParams logoParams = new LinearLayout.LayoutParams(240, 240);
+        imgLogo.setImageResource(R.drawable.logo); 
+        LinearLayout.LayoutParams logoParams = new LinearLayout.LayoutParams(250, 250);
         logoParams.gravity = Gravity.CENTER_HORIZONTAL;
-        logoParams.setMargins(0, 0, 0, 24);
+        logoParams.setMargins(0, 0, 0, 16);
         imgLogo.setLayoutParams(logoParams);
         mainLayout.addView(imgLogo);
 
-        // زر إضافة مشترك جديد
         Button btnAdd = new Button(this);
-        btnAdd.setText("+ إضافة مشترك جديد");
+        btnAdd.setText("إضافة مشترك جديد");
         btnAdd.setTextColor(Color.WHITE);
         btnAdd.setTextSize(16);
         btnAdd.setTypeface(null, Typeface.BOLD);
         
         GradientDrawable btnBackground = new GradientDrawable();
         btnBackground.setColor(Color.parseColor("#00838F"));
-        btnBackground.setCornerRadius(16);
+        btnBackground.setCornerRadius(8);
         btnAdd.setBackground(btnBackground);
         
         LinearLayout.LayoutParams btnParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, 120);
-        btnParams.setMargins(0, 0, 0, 24);
+                LinearLayout.LayoutParams.MATCH_PARENT, 110);
+        btnParams.setMargins(0, 0, 0, 16);
         btnAdd.setLayoutParams(btnParams);
         mainLayout.addView(btnAdd);
 
-        // قائمة المشتركين (ListView)
         listView = new ListView(this);
-        listView.setDividerHeight(16);
+        listView.setDivider(null);
         LinearLayout.LayoutParams listParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, 0, 1.0f);
         listView.setLayoutParams(listParams);
@@ -82,10 +79,8 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(mainLayout);
 
-        // load البيانات
         loadSubscribers();
 
-        // حدث الضغط على زر الإضافة
         btnAdd.setOnClickListener(v -> showAddSubscriberDialog());
     }
 
@@ -95,14 +90,13 @@ public class MainActivity extends AppCompatActivity {
         listView.setAdapter(adapter);
     }
 
-    // --- 2. نافذة إضافة مشترك جديد (Dialog) ---
     private void showAddSubscriberDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("إضافة مشترك جديد");
 
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(40, 20, 40, 20);
+        layout.setPadding(30, 20, 30, 20);
 
         final EditText inputName = new EditText(this);
         inputName.setHint("اسم المشترك");
@@ -148,14 +142,13 @@ public class MainActivity extends AppCompatActivity {
         builder.show();
     }
 
-    // --- 3. نافذة تجديد الاشتراك وتوثيق الأرشيف ---
     private void showRenewDialog(Subscriber s) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("تجديد اشتراك: " + s.name);
 
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(40, 20, 40, 20);
+        layout.setPadding(30, 20, 30, 20);
 
         final EditText inputMonthYear = new EditText(this);
         inputMonthYear.setHint("الشهر المؤرشف (مثال: 2026-11)");
@@ -165,19 +158,17 @@ public class MainActivity extends AppCompatActivity {
 
         builder.setPositiveButton("تأكيد التجديد والأرشفة", (dialog, which) -> {
             String monthYear = inputMonthYear.getText().toString().trim();
-            if (monthYear.isEmpty()) monthYear = "سجل قديم";
+            if (monthYear.isEmpty()) monthYear = "سجل الشهر السابق";
 
-            // نقل البيانات الحالية للأرشيف وتصفير معلومات الشهر الجديد
             dbHelper.archiveAndResetSubscriber(s.id, s.name, s.startDate, s.endDate, s.price, s.status, monthYear);
             loadSubscribers();
-            Toast.makeText(MainActivity.this, "تم أرشفة الشهر القديم وتجديد الاشتراك", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "تم ترحيل السجل للأرشيف وتجهيز الخانة للاشتراك الجديد", Toast.LENGTH_SHORT).show();
         });
 
         builder.setNegativeButton("إلغاء", null);
         builder.show();
     }
 
-    // --- 4. نموذج بيانات المشترك (Model) ---
     public static class Subscriber {
         public int id;
         public String name;
@@ -196,7 +187,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // --- 5. محول القائمة وحواف العناصر (Adapter & Border UI) ---
     private class SubscriberAdapter extends ArrayAdapter<Subscriber> {
         public SubscriberAdapter(Context context, List<Subscriber> items) {
             super(context, 0, items);
@@ -208,16 +198,19 @@ public class MainActivity extends AppCompatActivity {
 
             LinearLayout container = new LinearLayout(getContext());
             container.setOrientation(LinearLayout.VERTICAL);
-            container.setPadding(24, 24, 24, 24);
+            container.setPadding(16, 16, 16, 16);
 
-            // تصميم الحواف السوداء الرفيعة لتمييز المشتركين
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            params.setMargins(0, 0, 0, 12);
+            container.setLayoutParams(params);
+
             GradientDrawable border = new GradientDrawable();
             border.setColor(Color.WHITE);
-            border.setStroke(3, Color.parseColor("#000000")); // حواف سوداء رفيعة
-            border.setCornerRadius(12);
+            border.setStroke(4, Color.parseColor("#000000")); 
+            border.setCornerRadius(8);
             container.setBackground(border);
 
-            // اسم المشترك
             TextView txtName = new TextView(getContext());
             txtName.setText(s.name);
             txtName.setTextSize(18);
@@ -225,36 +218,40 @@ public class MainActivity extends AppCompatActivity {
             txtName.setTextColor(Color.BLACK);
             container.addView(txtName);
 
-            // تواريخ الاشتراك والسعر
             TextView txtDetails = new TextView(getContext());
-            txtDetails.setText("تاريخ التفعيل: " + s.startDate + " | الانتهاء: " + s.endDate + "\nالسعر: " + s.price);
-            txtDetails.setTextSize(13);
-            txtDetails.setTextColor(Color.parseColor("#444444"));
-            txtDetails.setPadding(0, 8, 0, 8);
+            txtDetails.setText("التفعيل: " + (s.startDate.isEmpty() ? "---" : s.startDate) + 
+                               " | الانتهاء: " + (s.endDate.isEmpty() ? "---" : s.endDate) + 
+                               "\nالسعر: " + (s.price.isEmpty() ? "---" : s.price));
+            txtDetails.setTextSize(14);
+            txtDetails.setTextColor(Color.parseColor("#333333"));
+            txtDetails.setPadding(0, 6, 0, 6);
             container.addView(txtDetails);
 
-            // حالة الدفع
             TextView txtStatus = new TextView(getContext());
-            txtStatus.setText("حالة الدفع: " + s.status);
+            txtStatus.setText("الحالة: " + s.status);
             txtStatus.setTextSize(14);
             txtStatus.setTypeface(null, Typeface.BOLD);
             if (s.status.equals("واصل")) {
-                txtStatus.setTextColor(Color.parseColor("#2E7D32")); // أخضر
+                txtStatus.setTextColor(Color.parseColor("#2E7D32"));
             } else {
-                txtStatus.setTextColor(Color.parseColor("#C62828")); // أحمر
+                txtStatus.setTextColor(Color.parseColor("#C62828"));
             }
             container.addView(txtStatus);
 
-            // زر التجديد للأرشيف
             Button btnRenew = new Button(getContext());
-            btnRenew.setText("تجديد الاشتراك للأرشيف");
+            btnRenew.setText("تجديد الاشتراك");
             btnRenew.setTextSize(12);
             btnRenew.setTextColor(Color.WHITE);
             
             GradientDrawable renewBg = new GradientDrawable();
-            renewBg.setColor(Color.parseColor("#37474F"));
-            renewBg.setCornerRadius(8);
+            renewBg.setColor(Color.parseColor("#0288D1"));
+            renewBg.setCornerRadius(6);
             btnRenew.setBackground(renewBg);
+
+            LinearLayout.LayoutParams btnParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, 90);
+            btnParams.setMargins(0, 10, 0, 0);
+            btnRenew.setLayoutParams(btnParams);
 
             btnRenew.setOnClickListener(v -> showRenewDialog(s));
             container.addView(btnRenew);
@@ -263,7 +260,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // --- 6. إدارة قاعدة البيانات والأرشيف الشهري (SQLite Helper) ---
     public static class DatabaseHelper extends SQLiteOpenHelper {
         private static final String DATABASE_NAME = "BakrNet.db";
         private static final int DATABASE_VERSION = 1;
@@ -274,9 +270,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-            // جدول المشتركين الحاليين
             db.execSQL("CREATE TABLE subscribers (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, start_date TEXT, end_date TEXT, price TEXT, status TEXT)");
-            // جدول الأرشيف المستقل للأشهر السابقة
             db.execSQL("CREATE TABLE archive (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, start_date TEXT, end_date TEXT, price TEXT, status TEXT, month_year TEXT)");
         }
 
@@ -321,7 +315,6 @@ public class MainActivity extends AppCompatActivity {
         public void archiveAndResetSubscriber(int id, String name, String startDate, String endDate, String price, String status, String monthYear) {
             SQLiteDatabase db = this.getWritableDatabase();
 
-            // 1. نقل السجل الشهري الحالي للأرشيف
             ContentValues archiveValues = new ContentValues();
             archiveValues.put("name", name);
             archiveValues.put("start_date", startDate);
@@ -331,7 +324,6 @@ public class MainActivity extends AppCompatActivity {
             archiveValues.put("month_year", monthYear);
             db.insert("archive", null, archiveValues);
 
-            // 2. إبقاء اسم المشترك فارغاً/جاهزاً للتجديد في القائمة الرئيسية
             ContentValues updateValues = new ContentValues();
             updateValues.put("start_date", "");
             updateValues.put("end_date", "");
@@ -341,3 +333,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 }
+
